@@ -1,0 +1,18 @@
+<?php 
+  require('app/helpers/junk_removal.php');
+  require('app/helpers/helpers.php');
+  require('app/helpers/shortcodes.php');
+  require('app/helpers/wp_interface.php');
+  require('app/helpers/scripts.php');
+  require('app/models/blog.php');
+  require('app/models/artwork.php');
+  require('app/models/navigation.php');
+  require('app/models/books.php');
+  require('app/models/book_page.php');
+  require('app/controllers/artwork.php');
+  require('app/controllers/artwork_categories.php');
+  require('app/controllers/navigation.php');
+  require('app/controllers/about.php');
+  require('app/controllers/contact.php');
+  require('app/controllers/books.php');
+?>
