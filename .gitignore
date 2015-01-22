@@ -1,2 +1,4 @@
 node_modules
 bower_components
+elosh-client
+.DS_Store

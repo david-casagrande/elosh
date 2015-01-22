@@ -5,6 +5,9 @@
     $cacheKey = 'artwork';
     $cache = get_transient($cacheKey);
 
+    if(!$str) {
+      @header( 'Content-Type: application/json; charset=' . get_option( 'blog_charset' ) );
+    }
     if( is_user_logged_in() || empty($cache) ) {
 
       $args = array(
@@ -39,7 +42,6 @@
 
       $all = json_encode(array('artworks' => $all));
       set_transient( $cacheKey, $all, YEAR_IN_SECONDS);
-
       echo $all;
 
       wp_reset_postdata();

@@ -1,9 +1,11 @@
-<?php 
+<?php
   function get_about_callback($str = false) {
     $cacheKey = 'about';
     $cache = get_transient($cacheKey);
-    
-    if( is_user_logged_in() || empty($cache) ) {     
+    if(!$str) {
+      @header( 'Content-Type: application/json; charset=' . get_option( 'blog_charset' ) );
+    }
+    if( is_user_logged_in() || empty($cache) ) {
 
       $args = array(
           'pagename' =>'about'
@@ -20,7 +22,7 @@
         );
         $all[] = $p;
       endwhile;
-      
+
       $all = json_encode( array('about' => count($all) > 0 ? $all[0] : array() ));
       set_transient( $cacheKey, $all, YEAR_IN_SECONDS);
       echo $all;
@@ -33,6 +35,6 @@
     if(!$str) { die(); }
 
   }
-  add_action( 'wp_ajax_nopriv_get_about', 'get_about_callback' ); 
-  add_action( 'wp_ajax_get_about', 'get_about_callback' ); 
+  add_action( 'wp_ajax_nopriv_get_about', 'get_about_callback' );
+  add_action( 'wp_ajax_get_about', 'get_about_callback' );
 ?>

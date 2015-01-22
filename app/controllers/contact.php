@@ -1,8 +1,10 @@
-<?php 
+<?php
   function get_contact_callback($str = false) {
     $cacheKey = 'contact';
     $cache = get_transient($cacheKey);
-    
+    if(!$str) {
+      @header( 'Content-Type: application/json; charset=' . get_option( 'blog_charset' ) );
+    }
     if( is_user_logged_in() || empty($cache) ) {
 
       $args = array(
@@ -22,7 +24,7 @@
           );
           $all[] = $p;
       endwhile;
-      
+
       $all = json_encode( array('contact' => count($all) > 0 ? $all[0] : array() ));
       set_transient( $cacheKey, $all, YEAR_IN_SECONDS);
       echo $all;
@@ -30,9 +32,9 @@
     }
     else {
       echo $cache;
-    }        
-    if(!$str) { die(); }  
+    }
+    if(!$str) { die(); }
   }
-  add_action( 'wp_ajax_nopriv_get_contact', 'get_contact_callback' ); 
-  add_action( 'wp_ajax_get_contact', 'get_contact_callback' ); 
+  add_action( 'wp_ajax_nopriv_get_contact', 'get_contact_callback' );
+  add_action( 'wp_ajax_get_contact', 'get_contact_callback' );
 ?>

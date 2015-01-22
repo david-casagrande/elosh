@@ -1,9 +1,10 @@
-<?php 
+<?php
   require('app/helpers/junk_removal.php');
   require('app/helpers/helpers.php');
   require('app/helpers/shortcodes.php');
   require('app/helpers/wp_interface.php');
   require('app/helpers/scripts.php');
+  require('app/helpers/rewrite_rule.php');
   require('app/models/blog.php');
   require('app/models/artwork.php');
   require('app/models/navigation.php');

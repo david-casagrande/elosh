@@ -25,13 +25,13 @@ App.NavigationView = Ember.View.extend({
     var parent = el.parent();
     var height = el.next().outerHeight();
     el.addClass('open');
-    parent.css({ 'height' : '+='+height+'px' });    
+    parent.css({ 'height' : '+='+height+'px' });
   },
 
   closeNavLinks: function(el){
     var parent = el.parent();
     el.removeClass('open');
-    parent.css({ 'height' : 20 });      
+    parent.css({ 'height' : 20 });
   },
 
   closeAll: function() {

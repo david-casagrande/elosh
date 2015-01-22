@@ -1,15 +1,17 @@
 <?php
   function get_books_callback($str = false) {
-    
+
     $cacheKey = 'books';
     $cache = get_transient($cacheKey);
-    
+    if(!$str) {
+      @header( 'Content-Type: application/json; charset=' . get_option( 'blog_charset' ) );
+    }
     if( is_user_logged_in() || empty($cache) ) {
 
       $args = array(
         'post_type' => array('books'),
-        'posts_per_page'=> -1,    
-        'post_status' => (is_user_logged_in() ? 'any' : 'publish')                          
+        'posts_per_page'=> -1,
+        'post_status' => (is_user_logged_in() ? 'any' : 'publish')
       );
       $query = new WP_Query( $args );
       $all = array();
@@ -36,15 +38,16 @@
             'medium'      => get_field('medium', $book_page->ID),
             'description' => get_field('description', $book_page->ID),
             'thumbnail'   => get_field('thumbnail', $book_page->ID),
-            'image'       => get_field('image', $book_page->ID)
+            'image'       => get_field('image', $book_page->ID),
+            'slug'        => $book_page->post_name
           );
           $book_pages[] = $b;
         }
         $a['book_pages'] = $book_pages;
-        
+
         $all[] = $a;
       endwhile;
-        
+
       $all = json_encode(array('books' => $all));
       set_transient( $cacheKey, $all, YEAR_IN_SECONDS);
       echo $all;
@@ -53,9 +56,9 @@
     else {
       echo $cache;
     }
-    
+
     if(!$str) { die(); }
   }
-  add_action( 'wp_ajax_nopriv_get_books', 'get_books_callback' ); 
-  add_action( 'wp_ajax_get_books', 'get_books_callback' ); 
+  add_action( 'wp_ajax_nopriv_get_books', 'get_books_callback' );
+  add_action( 'wp_ajax_get_books', 'get_books_callback' );
 ?>

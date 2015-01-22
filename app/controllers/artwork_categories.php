@@ -1,8 +1,10 @@
-<?php 
+<?php
   function get_artwork_categories_callback($str = false) {
     $cacheKey = 'artwork_categories';
     $cache = get_transient($cacheKey);
-
+    if(!$str) {
+      @header( 'Content-Type: application/json; charset=' . get_option( 'blog_charset' ) );
+    }
     if( is_user_logged_in() || empty($cache) ) {
       $categories = get_categories(array('taxonomy'=>'artwork-category') );
       echo json_encode(array('artwork_categories' => $categories));
@@ -12,8 +14,8 @@
     else {
       echo json_encode(array('artwork_categories' => $cache));
     }
-    if(!$str) { die(); }  
+    if(!$str) { die(); }
   }
-  add_action( 'wp_ajax_nopriv_get_artwork_categories', 'get_artwork_categories_callback' ); 
-  add_action( 'wp_ajax_get_artwork_categories', 'get_artwork_categories_callback' ); 
+  add_action( 'wp_ajax_nopriv_get_artwork_categories', 'get_artwork_categories_callback' );
+  add_action( 'wp_ajax_get_artwork_categories', 'get_artwork_categories_callback' );
 ?>

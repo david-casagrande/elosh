@@ -1,4 +1,4 @@
-<?php   
+<?php
 
   class Custom_Post_Type {
 
@@ -23,13 +23,13 @@
         add_action('init', array( &$this,'register_post_type') );
       }
     }
-    
+
     public function register_post_type(){
       $post = $this->post;
-      $args = array( 
-        'label' => __( $post['label'] ), 
-        'description' => __( $post['description'] ), 
-        'public' => true, 
+      $args = array(
+        'label' => __( $post['label'] ),
+        'description' => __( $post['description'] ),
+        'public' => true,
         'show_ui' => true,
           'capability_type' => 'post',
         'menu_position'=> 4,
@@ -37,9 +37,9 @@
         'menu_icon' => $post['menu_icon'],
         'supports' => $post['supports'],
         'rewrite' => array('slug' => $post['slug']),
-        'has_archive' => $post['slug'] 
+        'has_archive' => $post['slug']
       );
-      register_post_type( $this->post_type, $args); 
+      register_post_type( $this->post_type, $args);
     }
 
     public function register_custom_taxonomy(){
@@ -95,22 +95,28 @@
     public function register_and_enque(){
       $script = array(
         'name'       => isset($this->args['script']) ? $this->args['script'] : false,
-        'src'        => isset($this->args['script_src']) ? $this->args['script_src'] : false,
+        'src'        => isset($this->args['src']) ? $this->args['src'] : false,
         'deps'       => isset($this->args['script_dependencies']) ? $this->args['script_dependencies'] : false,
         'ver'        => isset($this->args['script_version']) ? $this->args['script_version'] : false,
         'in_footer'  => isset($this->args['load_in_footer']) ? $this->args['load_in_footer'] : false,
-        'use_wp_lib' => isset($this->args['use_wp_lib']) ? $this->args['use_wp_lib'] : false
+        'use_wp_lib' => isset($this->args['use_wp_lib']) ? $this->args['use_wp_lib'] : false,
+        'style' => isset($this->args['style']) ? $this->args['style'] : false
       );
 
-      //check for required 
-        if( $script['name'] && $script['src'] ) {
-          wp_register_script( $script['name'], $script['src'], $script['deps'], $script['ver'], $script['in_footer'] );
-          wp_enqueue_script( $script['name'] );
-          }
-          
-          if($script['name'] && $script['use_wp_lib']) {
-          wp_enqueue_script( $script['name'] );
-          }
+      //check for required
+      if($script['name'] && $script['src']) {
+        wp_register_script( $script['name'], $script['src'], $script['deps'], $script['ver'], $script['in_footer'] );
+        wp_enqueue_script( $script['name'] );
+      }
+
+      if($script['style'] && $script['src']) {
+        wp_enqueue_style($script['style'], $script['src'], $script['deps'], $script['ver'], $script['in_footer'] );
+        wp_enqueue_script( $script['name'] );
+      }
+
+      if($script['name'] && $script['use_wp_lib']) {
+        wp_enqueue_script( $script['name'] );
+      }
     }
   }
 ?>

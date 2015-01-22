@@ -1,7 +1,11 @@
-<?php 
+<?php
 
     //GET PAGES:
     function get_pages_callback($str = false) {
+        if(!$str) {
+          @header( 'Content-Type: application/json; charset=' . get_option( 'blog_charset' ) );
+        }
+
         $args = array(
             'post_type' =>'page',
             'post_status' => (is_user_logged_in() ? 'any' : 'publish')
@@ -18,20 +22,20 @@
             );
             $all[] = $p;
         endwhile;
-        
+
         $all = json_encode($all);
-        
+
         if($str) {
             echo $all;
-            wp_reset_postdata();        
+            wp_reset_postdata();
         }
         else {
             echo $all;
             wp_reset_postdata();
-            die();    
-        }  
+            die();
+        }
     }
-    add_action( 'wp_ajax_nopriv_get_pages', 'get_pages_callback' ); 
-    add_action( 'wp_ajax_get_pages', 'get_pages_callback' ); 
+    add_action( 'wp_ajax_nopriv_get_pages', 'get_pages_callback' );
+    add_action( 'wp_ajax_get_pages', 'get_pages_callback' );
 
 ?>
