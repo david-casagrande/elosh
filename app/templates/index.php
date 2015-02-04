@@ -1,7 +1,7 @@
 <div id="elosh-stub">
   <div id="left-nav">
     <div class="brand clear-fix">
-      <img src="<?php echo get_template_directory_uri(); ?>/assets/images/elosh-logo.jpg" alt="Eric Losh"/>
+      <img src="<?php echo get_template_directory_uri(); ?>/assets/dist/images/elosh-logo.jpg" alt="Eric Losh"/>
     </div>
     <div class="nav">
       <div class="artwork-nav">
@@ -24,7 +24,7 @@
       </div>
     </div>
     <div class="footer clear-fix">
-      <img src="<?php echo get_template_directory_uri(); ?>/assets/images/elosh-footer.jpg" alt="Eric Losh"/>
+      <img src="<?php echo get_template_directory_uri(); ?>/assets/dist/images/elosh-footer.jpg" alt="Eric Losh"/>
       <p>Web by <a href="https://github.com/david-casagrande" target="_blank" title="David Casagrande">David Casagrande</a></p>
     </div>
   </div>
