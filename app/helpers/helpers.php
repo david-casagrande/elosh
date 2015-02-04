@@ -10,7 +10,7 @@
         'description' => isset($args['post_new_item_label']) ? $args['post_new_item_label'] : 'Add New',
         'slug' => isset($args['post_slug']) ? $args['post_slug'] : $this->post_type,
         'supports' => isset($args['post_supports']) ? $args['post_supports'] : array('title', 'editor', 'custom-fields', 'author'),
-        'menu_icon' => isset($args['post_menu_icon']) ? get_template_directory_uri().'/assets/images/wp-interface/'.$args['post_menu_icon'] : false,
+        'menu_icon' => isset($args['post_menu_icon']) ? get_template_directory_uri().'/assets/dist/images/wp-interface/'.$args['post_menu_icon'] : false,
         'hierarchical' => isset($args['hierarchical']) ? $args['hierarchical'] : false
       );
 
