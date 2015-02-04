@@ -1,7 +1,7 @@
 <?php
 
-$client_dir = get_template_directory_uri().'/bower_components/elosh-client/dist/assets/';
-$foundation_dir = get_template_directory_uri().'/bower_components/foundation/css/';
+$client_dir = get_template_directory_uri().'/elosh-client/dist/assets/';
+$foundation_dir = get_template_directory_uri().'\/elosh-client/';
 
 if(defined('APP_ENVIRONMENT') && constant('APP_ENVIRONMENT') == 'production') {
   $client_dir = get_template_directory_uri().'/bower_components/elosh-client/dist_production/assets/';
