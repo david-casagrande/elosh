@@ -1,0 +1,2 @@
+# elosh
+Elosh WordPress Theme
