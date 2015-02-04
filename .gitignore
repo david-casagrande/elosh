@@ -1,6 +1,3 @@
 node_modules
-elosh-client/node_modules
-elosh-client/bower_components
-elosh-client/tmp
 bower_components
 .DS_Store
