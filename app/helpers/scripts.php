@@ -1,6 +1,6 @@
 <?php
 
-$client_dir = get_template_directory_uri().'/elosh-client/dist/assets/';
+$client_dir = get_template_directory_uri().'/elosh-client/bower_components/elosh-client/dist/assets/';
 $bower_dir = get_template_directory_uri().'/elosh-client/bower_components/';
 
 $scripts = array(
