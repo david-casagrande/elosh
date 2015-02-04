@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "rm -rf assets/dist && cp -a ./bower_components/elosh-client/dist/. ./assets/dist/ && rm -rf assets/dist_production && cp -a ./bower_components/elosh-client/dist/. ./assets/dist_production/ && rm -rf assets/foundation.css && cp -a ./bower_components/foundation/css/foundation.css ./assets/foundation.css"
+    "build": "rm -rf assets/dist && cp -a ./bower_components/elosh-client/dist/. ./assets/dist/ && rm -rf assets/dist_production && cp -a ./bower_components/elosh-client/dist_production/. ./assets/dist_production/ && rm -rf assets/foundation.css && cp -a ./bower_components/foundation/css/foundation.css ./assets/foundation.css"
   },
   "author": "",
   "license": "ISC",
