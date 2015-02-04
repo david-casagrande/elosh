@@ -1,1 +1,0 @@
-App.BookPagesController = Ember.ArrayController.extend(App.showArtModal);
