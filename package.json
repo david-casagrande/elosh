@@ -5,12 +5,15 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "rm -rf assets/dist && cp -a ./bower_components/elosh-client/dist/. ./assets/dist/ && rm -rf assets/dist_production && cp -a ./bower_components/elosh-client/dist_production/. ./assets/dist_production/ && rm -rf assets/foundation.css && cp -a ./bower_components/foundation/css/foundation.css ./assets/foundation.css"
+    "build": "rm -rf assets/dist && cp -a ./bower_components/elosh-client/dist/. ./assets/dist/ && rm -rf assets/dist_production && cp -a ./bower_components/elosh-client/dist_production/. ./assets/dist_production/ && rm -rf assets/foundation.css && cp -a ./bower_components/foundation/css/foundation.css ./assets/foundation.css && node_modules/.bin/minify ./assets/foundation.css"
   },
   "author": "",
   "license": "ISC",
   "devDependencies": {
     "gulp": "^3.8.10",
     "gulp-concat": "^2.4.3"
+  },
+  "dependencies": {
+    "minifier": "^0.6.2"
   }
 }

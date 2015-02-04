@@ -10,7 +10,7 @@ if(defined('APP_ENVIRONMENT') && constant('APP_ENVIRONMENT') == 'production') {
 $scripts = array(
   array('script' => 'vendor',       'src' => $client_dir.'vendor.js', 'load_in_footer' => true ),
   array('script' => 'elosh-client', 'src' => $client_dir.'elosh-client.js', 'load_in_footer' => true ),
-  array('style'  => 'foundation',   'src' => $foundation_dir.'foundation.css' ),
+  array('style'  => 'foundation',   'src' => $foundation_dir.'foundation.min.css' ),
   array('style'  => 'elosh-css',    'src' => $client_dir.'elosh-client.css' )
 );
 
