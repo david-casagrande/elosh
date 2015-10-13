@@ -819,6 +819,11 @@ define('elosh-client/routes/artwork/category/show', ['exports', 'ember', 'elosh-
     },
 
     afterModel: function afterModel(model) {
+      var controller = this.controllerFor('artwork.category');
+      if (!controller) {
+        return;
+      }
+
       var allArtwork = this.controllerFor('artwork.category').get('model.artwork');
       var nextArtIndex = this._nextArtwork(model, allArtwork);
 
@@ -4053,7 +4058,7 @@ catch(err) {
 if (runningTests) {
   require("elosh-client/tests/test-helper");
 } else {
-  require("elosh-client/app")["default"].create({"name":"elosh-client","version":"0.0.0+47ad42de"});
+  require("elosh-client/app")["default"].create({"name":"elosh-client","version":"0.0.0+e5b31049"});
 }
 
 /* jshint ignore:end */
