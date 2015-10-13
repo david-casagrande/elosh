@@ -421,13 +421,11 @@ define('elosh-client/mixins/components/art-modal-keyboard-navigation', ['exports
   });
 
 });
-define('elosh-client/mixins/components/art-modal-loading-management', ['exports', 'ember'], function (exports, Ember) {
+define('elosh-client/mixins/components/art-modal-loading-management', ['exports', 'ember', 'elosh-client/stores/image-data'], function (exports, Ember, ImageDataStore) {
 
   'use strict';
 
   /* global ProgressBar */
-
-  var ImageDataStore = {};
 
   exports['default'] = Ember['default'].Mixin.create({
 
@@ -475,50 +473,25 @@ define('elosh-client/mixins/components/art-modal-loading-management', ['exports'
     },
 
     _loadImage: function _loadImage() {
-      var artUrl = this.get('art.image.url');
-      if (typeof ImageDataStore[artUrl] !== 'undefined') {
-        this._setImageData(ImageDataStore[artUrl]);
-        this.get('progress').animate(1);
-      } else {
-        var self = this;
-        var oReq = new XMLHttpRequest();
-        oReq.onload = function () {
-          self._readFile(this.response);
-        };
-        oReq.onprogress = function (e) {
-          var p = parseFloat(e.loaded / e.total).toFixed(2);
-          var progress = self.get('progress');
+      var _this2 = this;
 
-          progress.stop();
-          progress.animate(p);
-        };
-        oReq.open('get', this.get('art.image.url'), true);
-        oReq.responseType = 'blob';
-        oReq.send();
-      }
+      var url = this.get('art.image.url');
+      ImageDataStore['default'].get(url, function (p) {
+        return _this2._setProgress(p);
+      }).then(function (dataUrl) {
+        return _this2._setImageData(dataUrl);
+      });
     },
 
-    _readFile: function _readFile(blob) {
-      var self = this;
-      var reader = new FileReader();
-      reader.onloadend = function () {
-        self._setImageData(reader.result);
-      };
-      reader.readAsDataURL(blob);
+    _setProgress: function _setProgress(p) {
+      var progress = this.get('progress');
+      progress.stop();
+      progress.animate(p);
     },
 
     _setImageData: function _setImageData(dataUrl) {
       this.set('imageDataUrl', dataUrl);
       this._setImageLoaded();
-      this._cacheImageData(dataUrl);
-    },
-
-    _cacheImageData: function _cacheImageData(dataUrl) {
-      var artUrl = this.get('art.image.url');
-      if (typeof ImageDataStore[artUrl] !== 'undefined') {
-        return;
-      }
-      ImageDataStore[artUrl] = dataUrl;
     },
 
     _setImageLoaded: function _setImageLoaded() {
@@ -539,6 +512,35 @@ define('elosh-client/mixins/components/art-modal-loading-management', ['exports'
       }, 2000); // 2s via .loaded class fades out overlay time
 
       this.get('timers').addObject(timer);
+    }
+  });
+
+});
+define('elosh-client/mixins/routes/next-artwork', ['exports', 'ember'], function (exports, Ember) {
+
+  'use strict';
+
+  exports['default'] = Ember['default'].Mixin.create({
+    _nextArtwork: function _nextArtwork(art, allArtwork) {
+      var previous = arguments.length <= 2 || arguments[2] === undefined ? false : arguments[2];
+
+      var artIndex, nextArtIndex;
+
+      allArtwork.find(function (artwork, idx) {
+        var found = artwork.get('id') === art.get('id');
+        if (found) {
+          artIndex = idx;
+        }
+        return found;
+      });
+
+      if (previous) {
+        nextArtIndex = artIndex !== 0 ? artIndex - 1 : allArtwork.get('length') - 1;
+      } else {
+        nextArtIndex = artIndex < allArtwork.get('length') - 1 ? artIndex + 1 : 0;
+      }
+
+      return nextArtIndex;
     }
   });
 
@@ -804,12 +806,11 @@ define('elosh-client/routes/application', ['exports', 'ember'], function (export
   });
 
 });
-define('elosh-client/routes/artwork/category/show', ['exports', 'ember'], function (exports, Ember) {
+define('elosh-client/routes/artwork/category/show', ['exports', 'ember', 'elosh-client/mixins/routes/next-artwork', 'elosh-client/stores/image-data'], function (exports, Ember, NextArtwork, ImageDataStore) {
 
   'use strict';
 
-  exports['default'] = Ember['default'].Route.extend({
-
+  exports['default'] = Ember['default'].Route.extend(NextArtwork['default'], {
     model: function model(params) {
       var artwork = this.store.peekAll('artwork'),
           art = artwork.findBy('slug', params.artwork_slug);
@@ -817,18 +818,27 @@ define('elosh-client/routes/artwork/category/show', ['exports', 'ember'], functi
       return art ? art : {};
     },
 
+    afterModel: function afterModel(model) {
+      var allArtwork = this.controllerFor('artwork.category').get('model.artwork');
+      var nextArtIndex = this._nextArtwork(model, allArtwork);
+
+      var nextArt = allArtwork.objectAt(nextArtIndex);
+      nextArt.get('image').then(function (img) {
+        return ImageDataStore['default'].get(img.get('url'));
+      });
+    },
+
     renderTemplate: function renderTemplate(controller) {
       this.send('openModal', { template: 'artwork.category.show', controller: controller });
     }
-
   });
 
 });
-define('elosh-client/routes/artwork/category', ['exports', 'ember', 'elosh-client/mixins/routes/scroll-to-top'], function (exports, Ember, ScrollToTop) {
+define('elosh-client/routes/artwork/category', ['exports', 'ember', 'elosh-client/mixins/routes/scroll-to-top', 'elosh-client/mixins/routes/next-artwork'], function (exports, Ember, ScrollToTop, NextArtwork) {
 
   'use strict';
 
-  exports['default'] = Ember['default'].Route.extend(ScrollToTop['default'], {
+  exports['default'] = Ember['default'].Route.extend(ScrollToTop['default'], NextArtwork['default'], {
 
     actions: {
       closeModal: function closeModal() {
@@ -863,27 +873,11 @@ define('elosh-client/routes/artwork/category', ['exports', 'ember', 'elosh-clien
     _transitionToArt: function _transitionToArt(art) {
       var previous = arguments.length <= 1 || arguments[1] === undefined ? false : arguments[1];
 
-      var allArtwork = this.get('controller.model.artwork'),
-          artIndex,
-          nextArtIndex;
-
-      allArtwork.find(function (artwork, idx) {
-        var found = artwork.get('id') === art.get('id');
-        if (found) {
-          artIndex = idx;
-        }
-        return found;
-      });
-
-      if (previous) {
-        nextArtIndex = artIndex !== 0 ? artIndex - 1 : allArtwork.get('length') - 1;
-      } else {
-        nextArtIndex = artIndex < allArtwork.get('length') - 1 ? artIndex + 1 : 0;
-      }
+      var allArtwork = this.get('controller.model.artwork');
+      var nextArtIndex = this._nextArtwork(art, allArtwork, previous);
 
       this.transitionTo('artwork.category.show', allArtwork.objectAt(nextArtIndex).get('slug'));
     }
-
   });
 
 });
@@ -931,12 +925,11 @@ define('elosh-client/routes/books/index', ['exports', 'ember', 'elosh-client/mix
   });
 
 });
-define('elosh-client/routes/books/show/book-page', ['exports', 'ember'], function (exports, Ember) {
+define('elosh-client/routes/books/show/book-page', ['exports', 'ember', 'elosh-client/mixins/routes/next-artwork', 'elosh-client/stores/image-data'], function (exports, Ember, NextArtwork, ImageDataStore) {
 
   'use strict';
 
-  exports['default'] = Ember['default'].Route.extend({
-
+  exports['default'] = Ember['default'].Route.extend(NextArtwork['default'], {
     model: function model(params) {
       var artwork = this.store.peekAll('artwork'),
           art = artwork.findBy('slug', params.book_page);
@@ -944,10 +937,21 @@ define('elosh-client/routes/books/show/book-page', ['exports', 'ember'], functio
       return art ? art : {};
     },
 
+    afterModel: function afterModel(model) {
+      var _this = this;
+
+      this.controllerFor('books.show').get('model.bookPages').then(function (bookPages) {
+        var nextArtIndex = _this._nextArtwork(model, bookPages);
+        var nextArt = bookPages.objectAt(nextArtIndex);
+        nextArt.get('image').then(function (img) {
+          return ImageDataStore['default'].get(img.get('url'));
+        });
+      });
+    },
+
     renderTemplate: function renderTemplate(controller) {
       this.send('openModal', { template: 'books.show.bookPage', controller: controller });
     }
-
   });
 
 });
@@ -1084,6 +1088,70 @@ define('elosh-client/serializers/book', ['exports', 'elosh-client/serializers/ap
     }
 
   });
+
+});
+define('elosh-client/stores/image-data', ['exports', 'ember'], function (exports, Ember) {
+
+  'use strict';
+
+  var ImageDataStore = {};
+
+  function get(url, progressCallback) {
+    if (typeof ImageDataStore[url] !== 'undefined') {
+      if (progressCallback) {
+        progressCallback(1);
+      }
+      return new Ember['default'].RSVP.Promise(function (resolve) {
+        return resolve(ImageDataStore[url]);
+      });
+    }
+
+    return request(url, progressCallback).then(function (response) {
+      return readFile(response);
+    }).then(function (dataUrl) {
+      return cacheFile(url, dataUrl);
+    });
+  }
+
+  function request(url, progressCallback) {
+    return new Ember['default'].RSVP.Promise(function (resolve) {
+      var oReq = new XMLHttpRequest();
+
+      oReq.onload = function (response) {
+        resolve(this.response);
+      };
+
+      if (progressCallback) {
+        oReq.onprogress = function (e) {
+          var p = parseFloat(e.loaded / e.total).toFixed(2);
+          progressCallback(p);
+        };
+      }
+
+      oReq.open('get', url, true);
+      oReq.responseType = 'blob';
+      oReq.send();
+    });
+  }
+
+  function readFile(blob) {
+    return new Ember['default'].RSVP.Promise(function (resolve) {
+      var reader = new FileReader();
+      reader.onloadend = function () {
+        resolve(reader.result);
+      };
+      reader.readAsDataURL(blob);
+    });
+  }
+
+  function cacheFile(url, dataUrl) {
+    ImageDataStore[url] = dataUrl;
+    return ImageDataStore[url];
+  }
+
+  exports['default'] = {
+    get: get
+  };
 
 });
 define('elosh-client/templates/about', ['exports'], function (exports) {
@@ -3680,6 +3748,16 @@ define('elosh-client/tests/mixins/components/art-modal-loading-management.jshint
   });
 
 });
+define('elosh-client/tests/mixins/routes/next-artwork.jshint', function () {
+
+  'use strict';
+
+  QUnit.module('JSHint - mixins/routes');
+  QUnit.test('mixins/routes/next-artwork.js should pass jshint', function(assert) { 
+    assert.ok(true, 'mixins/routes/next-artwork.js should pass jshint.'); 
+  });
+
+});
 define('elosh-client/tests/mixins/routes/redirect-to-first-item.jshint', function () {
 
   'use strict';
@@ -3920,6 +3998,16 @@ define('elosh-client/tests/serializers/book.jshint', function () {
   });
 
 });
+define('elosh-client/tests/stores/image-data.jshint', function () {
+
+  'use strict';
+
+  QUnit.module('JSHint - stores');
+  QUnit.test('stores/image-data.js should pass jshint', function(assert) { 
+    assert.ok(false, 'stores/image-data.js should pass jshint.\nstores/image-data.js: line 20, col 28, \'response\' is defined but never used.\n\n1 error'); 
+  });
+
+});
 define('elosh-client/tests/test-helper', ['elosh-client/tests/helpers/resolver', 'ember-qunit'], function (resolver, ember_qunit) {
 
 	'use strict';
@@ -3965,7 +4053,7 @@ catch(err) {
 if (runningTests) {
   require("elosh-client/tests/test-helper");
 } else {
-  require("elosh-client/app")["default"].create({"name":"elosh-client","version":"0.0.0+badf82c6"});
+  require("elosh-client/app")["default"].create({"name":"elosh-client","version":"0.0.0+47ad42de"});
 }
 
 /* jshint ignore:end */
