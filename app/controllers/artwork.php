@@ -22,7 +22,7 @@
 
         $categories = get_the_terms( get_the_ID(), 'artwork-category' );
         $cat_slugs = array();
-        foreach ($categories as $cat){
+        foreach ((array) $categories as $cat){
             $cat_slugs[] = $cat->slug;
         };
 
