@@ -13,7 +13,9 @@
       $args = array(
         'post_type' => array('artwork'),
         'posts_per_page'=> -1,
-        'post_status' => (is_user_logged_in() ? 'any' : 'publish')
+        'post_status' => (is_user_logged_in() ? 'any' : 'publish'),
+        'orderby' => 'menu_order',
+        'order' => 'ASC'
       );
       $query = new WP_Query( $args );
       $all = array();
