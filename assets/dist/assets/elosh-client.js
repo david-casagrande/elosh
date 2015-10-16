@@ -501,8 +501,8 @@ define('elosh-client/mixins/components/art-modal-loading-management', ['exports'
       var url = this.get('art.image.url');
       ImageDataStore['default'].get(url, function (p) {
         return _this2._setProgress(p);
-      }).then(function (dataUrl) {
-        return _this2._setImageData(dataUrl);
+      }).then(function () {
+        return _this2._setImageData();
       });
     },
 
@@ -512,8 +512,8 @@ define('elosh-client/mixins/components/art-modal-loading-management', ['exports'
       progress.animate(p);
     },
 
-    _setImageData: function _setImageData(dataUrl) {
-      this.set('imageDataUrl', dataUrl);
+    _setImageData: function _setImageData() {
+      // this.set('imageDataUrl', dataUrl);
       this._setImageLoaded();
     },
 
@@ -1151,10 +1151,10 @@ define('elosh-client/stores/image-data', ['exports', 'ember'], function (exports
       });
     }
 
-    return request(url, progressCallback).then(function (response) {
-      return readFile(response);
-    }).then(function (dataUrl) {
-      return cacheFile(url, dataUrl);
+    return request(url, progressCallback)
+    // .then((response) => readFile(response))
+    .then(function (response) {
+      return cacheFile(url /*, dataUrl*/);
     });
   }
 
@@ -1162,7 +1162,7 @@ define('elosh-client/stores/image-data', ['exports', 'ember'], function (exports
     return new Ember['default'].RSVP.Promise(function (resolve) {
       var oReq = new XMLHttpRequest();
 
-      oReq.onload = function (response) {
+      oReq.onload = function () {
         resolve(this.response);
       };
 
@@ -1179,18 +1179,19 @@ define('elosh-client/stores/image-data', ['exports', 'ember'], function (exports
     });
   }
 
-  function readFile(blob) {
-    return new Ember['default'].RSVP.Promise(function (resolve) {
-      var reader = new FileReader();
-      reader.onloadend = function () {
-        resolve(reader.result);
-      };
-      reader.readAsDataURL(blob);
-    });
-  }
+  // function readFile(blob) {
+  //   return new Ember.RSVP.Promise((resolve) => {
+  //     var reader  = new FileReader();
+  //     reader.onloadend = function () {
+  //       resolve(reader.result);
+  //     };
+  //     reader.readAsDataURL(blob);
+  //   });
+  // }
 
-  function cacheFile(url, dataUrl) {
-    ImageDataStore[url] = dataUrl;
+  function cacheFile(url /*, dataUrl*/) {
+    // ImageDataStore[url] = dataUrl;
+    ImageDataStore[url] = true;
     return ImageDataStore[url];
   }
 
@@ -2308,8 +2309,8 @@ define('elosh-client/templates/components/art-modal', ['exports'], function (exp
           return morphs;
         },
         statements: [
-          ["attribute","src",["concat",[["get","imageDataUrl",["loc",[null,[3,16],[3,28]]]]]]],
-          ["attribute","alt",["concat",[["get","art.title",["loc",[null,[3,39],[3,48]]]]]]]
+          ["attribute","src",["concat",[["get","art.image.url",["loc",[null,[3,16],[3,29]]]]]]],
+          ["attribute","alt",["concat",[["get","art.title",["loc",[null,[3,40],[3,49]]]]]]]
         ],
         locals: [],
         templates: []
@@ -2598,7 +2599,7 @@ define('elosh-client/templates/components/art-modal', ['exports'], function (exp
         return morphs;
       },
       statements: [
-        ["block","if",[["get","imageDataUrl",["loc",[null,[2,8],[2,20]]]]],[],0,null,["loc",[null,[2,2],[4,9]]]],
+        ["block","if",[["get","art.image.url",["loc",[null,[2,8],[2,21]]]]],[],0,null,["loc",[null,[2,2],[4,9]]]],
         ["block","if",[["get","art.title",["loc",[null,[7,8],[7,17]]]]],[],1,null,["loc",[null,[7,2],[7,64]]]],
         ["block","if",[["get","art.bookTitle",["loc",[null,[8,8],[8,21]]]]],[],2,null,["loc",[null,[8,2],[8,73]]]],
         ["block","if",[["get","art.medium",["loc",[null,[9,8],[9,18]]]]],[],3,null,["loc",[null,[9,2],[9,67]]]],
@@ -4069,7 +4070,7 @@ define('elosh-client/tests/stores/image-data.jshint', function () {
 
   QUnit.module('JSHint - stores');
   QUnit.test('stores/image-data.js should pass jshint', function(assert) { 
-    assert.ok(false, 'stores/image-data.js should pass jshint.\nstores/image-data.js: line 20, col 28, \'response\' is defined but never used.\n\n1 error'); 
+    assert.ok(false, 'stores/image-data.js should pass jshint.\nstores/image-data.js: line 13, col 12, \'response\' is defined but never used.\n\n1 error'); 
   });
 
 });
@@ -4118,7 +4119,7 @@ catch(err) {
 if (runningTests) {
   require("elosh-client/tests/test-helper");
 } else {
-  require("elosh-client/app")["default"].create({"name":"elosh-client","version":"0.0.0+c667cd80"});
+  require("elosh-client/app")["default"].create({"name":"elosh-client","version":"0.0.0+ddb7e61b"});
 }
 
 /* jshint ignore:end */
